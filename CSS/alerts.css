@@ -93,7 +93,7 @@ body {
   align-items: center;
 }
 
-#alertImageWrapper {
+#alertVideosWrapper {
   width: 200px;
   height: 200px;
   display: flex;
@@ -103,9 +103,9 @@ body {
   margin-right: 10px;
 }
 
-#alertImage {
-  max-height: 200px;
-  max-width: 200px;
+#alertVideo {
+  max-height: 1000px;
+  max-width: 1000px;
 }
 
 #title {

@@ -23,13 +23,13 @@ additionally
 */
 
 // By default all alerts will display for 5 seconds before fading out
-const defaultEventDisplayTime = 5000;
-const enableTTS = false; // if false no TTS regardless of settings
-const supressGiftBombSubEvents = true;
+const defaultEventDisplayTime = 5000
+const enableTTS = false // if false no TTS regardless of settings
+const supressGiftBombSubEvents = true
 
 // if DEBUG_MODE is set to true, events will be emitted into the console. This is useful if
 // you're customizing your events, and want to see what data is sent with any given event.
-const DEBUG_MODE = false;
+const DEBUG_MODE = false
 
 // look at https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis for more info on TTS props and voices
 const defaultTTSSettings = {
@@ -37,126 +37,129 @@ const defaultTTSSettings = {
   delay: 1000,
   pitch: 1,
   rate: 1.3,
-  voice: "Zira",
-  volume: 1,
-};
+  voice: 'Zira',
+  volume: 1
+}
 
 // CSS variable settings
 
 // If you want to use these overrides, set this to true
-const useCSSVariables = false;
+const useCSSVariables = false
 // color of message
-const primaryTextColor = "#ffffff";
+const primaryTextColor = '#ffffff'
 // color of alert title
-const titleColor = "#00eeae";
+const titleColor = '#00eeae'
 // text shadow applied to both message and title
 const textShadow =
-  "0px 0px 2px rgba(0, 0, 0, 0.85), 0px 0px 4px rgba(0, 0, 0, 0.7)";
+  '0px 0px 2px rgba(0, 0, 0, 0.85), 0px 0px 4px rgba(0, 0, 0, 0.7)'
 // the fonts you want to use. These fonts need to be installed on your system if you want them to work.
-const fontStack = "'Montserrat-optimized', Monserrat, Verdana, sans-serif";
+const fontStack = "'Montserrat-optimized', Monserrat, Verdana, sans-serif"
 // how fast the alert should animate in
-const animateInSpeed = "2s";
+const animateInSpeed = '2s'
 // how fast the alert should animate out
-const animateOutSpeed = "2s";
+const animateOutSpeed = '2s'
 // how fast the image of the alert should animate in
-const imgAnimateInSpeed = "2.5s";
+const imgAnimateInSpeed = '2.5s'
 // how fast the image of the alert should animate out
-const imgAnimateOutSpeed = "2.5s";
+const imgAnimateOutSpeed = '2.5s'
 
 const eventResponseStructure = {
   // https://docs.streamer.bot/api/servers/websocket/events/twitch#follow
-  "Twitch.Follow": {
-    title: ["New Follower"],
-    message: ["Welcome {user_name}!", "Howdy {user_name}!"],
-    images: ["images/welcome-1.webp"],
-    sounds: ["sounds/alert-follow.mp3"],
-    duration: 8000,
+  'Twitch.Follow': {
+    title: ['New Follower'],
+    message: ['Welcome {user_name}!', 'Howdy {user_name}!'],
+    videos: ['videos/follow.webm'],
+    sounds: ['sounds/alert-follow.mp3'],
+    duration: 8000
   },
   // https://docs.streamer.bot/api/servers/websocket/events/twitch#cheer
-  "Twitch.Cheer": {
-    title: ["{user.name} gave bits!"],
-    anonTitle: ["Bits!"],
-    message: ["Thanks for the {bits} bits, {user.name}"],
-    anonMessage: ["Thanks for the {bits} bits, anonymous patron!"],
-    images: ["images/cheer-1.webp"],
-    sounds: ["sounds/alert-cheer.mp3"],
+  'Twitch.Cheer': {
+    title: ['{user.name} gave bits!'],
+    anonTitle: ['Bits!'],
+    message: ['Thanks for the {bits} bits, {user.name}'],
+    anonMessage: ['Thanks for the {bits} bits, anonymous patron!'],
+    videos: ['videos/cheer-1.webp'],
+    sounds: ['sounds/alert-cheer.mp3'],
     showUserMessage: true,
     duration: 4000,
     textToSpeech: true,
     exclusions: [],
     tts: {
-      delay: 3000,
+      delay: 3000
     },
     variants: {
       100: {
-        title: ["exact match"],
+        title: ['exact match']
       },
-      "100-105": {
-        title: ["range match"],
+      200: {
+        title: ['exact match2']
+      },
+      '100-105': {
+        title: ['range match']
       },
       x25: {
-        title: ["mutliple match"],
+        title: ['mutliple match']
       },
-      ">1000": {
-        title: ["gt match"],
+      '>1000': {
+        title: ['gt match']
       },
-      "<2": {
-        title: ["lt match"],
-      },
-    },
+      '<2': {
+        title: ['lt match']
+      }
+    }
   },
   // https://docs.streamer.bot/api/servers/websocket/events/twitch#raid
-  "Twitch.Raid": {
-    title: ["{from_broadcaster_user_name} is here!"],
-    message: ["Welcome!", "Hello raiders!"],
-    images: [],
-    sounds: ["sounds/alert-raid.mp3"],
+  'Twitch.Raid': {
+    title: ['{from_broadcaster_user_name} is here!'],
+    message: ['Welcome!', 'Hello raiders!'],
+    videos: ['videos/raid.webm'],
+    sounds: ['sounds/alert-raid.mp3'],
     showProfileImage: true,
-    duration: 8000,
+    duration: 8000
   },
   // https://docs.streamer.bot/api/servers/websocket/events/twitch#sub
-  "Twitch.Sub": {
-    title: ["New Subscriber"],
-    message: ["Thanks for the sub, {user.name}!"],
-    primeMessage: ["Thanks for the Twitch Prime sub {user.name}!"],
-    images: ["images/sub-1.webp"],
-    sounds: ["sounds/alert-sub.mp3"],
+  'Twitch.Sub': {
+    title: ['New Subscriber'],
+    message: ['Thanks for the sub, {user.name}!'],
+    primeMessage: ['Thanks for the Twitch Prime sub {user.name}!'],
+    videos: ['vidoes/sub-1.webp'],
+    sounds: ['sounds/alert-sub.mp3'],
     showUserMessage: true,
-    duration: 10000,
+    duration: 10000
   },
   // https://docs.streamer.bot/api/servers/websocket/events/twitch#resub
-  "Twitch.ReSub": {
-    title: ["{user.name} Resubscribed!"],
-    message: ["Thanks for the {cumulativeMonths} months, {user.name}!"],
+  'Twitch.ReSub': {
+    title: ['{user.name} Resubscribed!'],
+    message: ['Thanks for the {cumulativeMonths} months, {user.name}!'],
     primeMessage: [
-      "Thanks for resubbing with your Twitch Prime sub {user.name}!",
+      'Thanks for resubbing with your Twitch Prime sub {user.name}!'
     ],
-    images: ["images/sub-1.webp"],
-    sounds: ["sounds/alert-sub.mp3"],
+    videos: ['videos/sub-1.webm'],
+    sounds: ['sounds/alert-sub.mp3'],
     showUserMessage: true,
-    duration: 10000,
+    duration: 10000
   },
   // https://docs.streamer.bot/api/servers/websocket/events/twitch#gift-sub
-  "Twitch.GiftSub": {
-    title: ["{recipient.name} was gifted a sub"],
-    anonTitle: ["{recipient.name} was gifted a sub"],
-    message: ["Thanks for the gift sub, {user.name}"],
-    anonMessage: ["Thanks for the gift sub, anonymous patron!"],
-    primeMessage: ["There are prime gift subs?!"],
-    images: ["images/sub-1.webp"],
-    sounds: ["sounds/alert-sub.mp3"],
-    duration: 10000,
+  'Twitch.GiftSub': {
+    title: ['{recipient.name} was gifted a sub'],
+    anonTitle: ['{recipient.name} was gifted a sub'],
+    message: ['Thanks for the gift sub, {user.name}'],
+    anonMessage: ['Thanks for the gift sub, anonymous patron!'],
+    primeMessage: ['There are prime gift subs?!'],
+    videos: ['videos/giftsub-1.webm'],
+    sounds: ['sounds/alert-sub.mp3'],
+    duration: 10000
   },
   // https://docs.streamer.bot/api/servers/websocket/events/twitch#gift-bomb
-  "Twitch.GiftBomb": {
-    title: ["{user.name} gifted {gifts} subs"],
-    anonTitle: ["{gifts} subs have been gifted"],
-    message: ["Thanks {user.name} for the subs!"],
-    anonMessage: ["Thanks for the {gifts} subs!"],
-    primeMessage: ["There are prime gift subs?!"],
-    images: ["images/sub-1.webp"],
-    sounds: ["sounds/alert-sub.mp3"],
-    duration: 10000,
+  'Twitch.GiftBomb': {
+    title: ['{user.name} gifted {gifts} subs'],
+    anonTitle: ['{gifts} subs have been gifted'],
+    message: ['Thanks {user.name} for the subs!'],
+    anonMessage: ['Thanks for the {gifts} subs!'],
+    primeMessage: ['There are prime gift subs?!'],
+    videos: ['videos/subbomb-1.webm'],
+    sounds: ['sounds/alert-sub.mp3'],
+    duration: 10000
   },
 
   /*
@@ -173,46 +176,46 @@ const eventResponseStructure = {
         "items": string[] // ShopOrder event only
     }
   */
-  "Kofi.Donation": {
-    title: ["{from} donated {amount} {currency}!"],
-    anonTitle: ["Someone donated {amount} {currency}!"],
-    message: ["Thanks {from} for the donation!"],
-    anonMessage: ["Thanks for the donation, mysterious stranger!"],
-    images: ["images/sub-1.webp"],
-    sounds: ["sounds/alert-sub.mp3"],
+  'Kofi.Donation': {
+    title: ['{from} donated {amount} {currency}!'],
+    anonTitle: ['Someone donated {amount} {currency}!'],
+    message: ['Thanks {from} for the donation!'],
+    anonMessage: ['Thanks for the donation, mysterious stranger!'],
+    images: ['images/sub-1.webp'],
+    sounds: ['sounds/alert-sub.mp3'],
     textToSpeech: true,
     showUserMessage: true,
     exclusions: [],
-    variants: [],
+    variants: []
   },
-  "Kofi.Subscription": {
-    title: ["{from} has subscribed!"],
-    message: ["Thanks {from} for subscribing on KoFi!"],
-    images: ["images/sub-1.webp"],
-    sounds: ["sounds/alert-sub.mp3"],
+  'Kofi.Subscription': {
+    title: ['{from} has subscribed!'],
+    message: ['Thanks {from} for subscribing on KoFi!'],
+    images: ['images/sub-1.webp'],
+    sounds: ['sounds/alert-sub.mp3'],
     textToSpeech: true,
     showUserMessage: true,
     exclusions: [],
-    variants: [],
+    variants: []
   },
-  "Kofi.Resubscription": {
-    title: ["{from} has resubscribed!"],
-    message: ["Thanks {from} for the continued support!"],
-    images: ["images/sub-1.webp"],
-    sounds: ["sounds/alert-sub.mp3"],
+  'Kofi.Resubscription': {
+    title: ['{from} has resubscribed!'],
+    message: ['Thanks {from} for the continued support!'],
+    images: ['images/sub-1.webp'],
+    sounds: ['sounds/alert-sub.mp3'],
     textToSpeech: true,
     showUserMessage: true,
     exclusions: [],
-    variants: [],
+    variants: []
   },
-  "Kofi.ShopOrder": {
-    title: ["{from} bought some stuff!"],
-    message: ["Thanks {from} for the purchase!"],
-    images: ["images/sub-1.webp"],
-    sounds: ["sounds/alert-sub.mp3"],
+  'Kofi.ShopOrder': {
+    title: ['{from} bought some stuff!'],
+    message: ['Thanks {from} for the purchase!'],
+    images: ['images/sub-1.webp'],
+    sounds: ['sounds/alert-sub.mp3'],
     textToSpeech: true,
     showUserMessage: true,
     exclusions: [],
-    variants: [],
-  },
-};
+    variants: []
+  }
+}

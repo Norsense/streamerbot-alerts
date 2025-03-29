@@ -17,8 +17,18 @@
 
     <template id="twitchAlertTemplate">
       <div class="alert twitch-alert bounce-in">
-        <div id="alertImageWrapper">
-          <img src="" id="alertImage" class="bounce-in-img" />
+        <div id="alertVideoWrapper">
+          <video
+            id="alertVideo"
+            class="bounce-in-vid"
+            width="1000"
+            height="1000"
+            autoplay
+            loop
+          >
+            <source src="" type="video/webm" />
+            Your browser does not support the video tag.
+          </video>
         </div>
         <div id="details">
           <h1 id="title"></h1>
