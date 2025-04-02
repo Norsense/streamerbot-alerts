@@ -18,6 +18,30 @@
     <template id="twitchAlertTemplate">
       <div class="alert twitch-alert bounce-in">
         <div id="alertImageWrapper">
+          <video
+            width="854"
+            height="480"
+            autoplay
+            loop
+            muted
+            id="alertImage"
+            class="bounce-in-img"
+          >
+            <source src="" id="alertImage" class="bounce-in-img" />
+          </video>
+        </div>
+        <div id="details">
+          <div>
+            <h1 id="username"></h1>
+            <h2 id="title"></h2>
+          </div>
+          <h3 id="message"></h3>
+        </div>
+      </div>
+    </template>
+    <!-- <template id="twitchAlertTemplate">
+      <div class="alert twitch-alert bounce-in">
+        <div id="alertImageWrapper">
           <img src="" id="alertImage" class="bounce-in-img" />
         </div>
         <div id="details">
@@ -25,7 +49,7 @@
           <h2 id="message"></h2>
         </div>
       </div>
-    </template>
+    </template> -->
 
     <template id="kofiAlertTemplate">
       <div class="alert kofi-alert bounce-in">

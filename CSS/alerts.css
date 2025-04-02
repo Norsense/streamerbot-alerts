@@ -1,8 +1,9 @@
 :root {
   --primary-text-color: #ffffff;
+  --default-username-color: #04ff00;
   --default-title-color: #00eeae; /* 00eeae */
   --text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.85), 0px 0px 4px rgba(0, 0, 0, 0.7);
-  --font-stack: "Montserrat-optimized", Monserrat, Verdana, sans-serif;
+  --font-stack: "Bubblegum-Sans", Bubblegum-Sans, Verdana, sans-serif;
   --animate-in-speed: 2s;
   --animate-out-speed: 2s;
   --img-animate-in-speed: 2.5s;
@@ -12,9 +13,11 @@
 body {
   font-family: var(--font-stack);
   color: var(--primary-text-color);
+  width: 1920px;
+  height: 1080px;
 }
 
-/* https://codepen.io/nelledejones/pen/gOOPWrK css trnasitions */
+/* https://codepen.io/nelledejones/pen/gOOPWrK css transitions */
 .bounce-in {
   -webkit-font-smoothing: subpixel-antialiased;
   animation: bounce-in var(--animate-in-speed) ease normal;
@@ -85,39 +88,61 @@ body {
 }
 
 .alert {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
-  flex-direction: row;
-  max-width: 1000px;
-  margin: 100px 0px 00px 60px;
+  flex-direction: column;
+  justify-content: center;
   align-content: center;
   align-items: center;
 }
 
 #alertImageWrapper {
-  width: 200px;
-  height: 200px;
+  width: 500px;
+  height: 500px;
   display: flex;
-  align-items: center;
+  flex-direction: row;
   align-content: center;
   justify-content: center;
-  margin-right: 10px;
+}
+
+video {
+  max-width: 100%;
 }
 
 #alertImage {
-  max-height: 200px;
-  max-width: 200px;
+  max-height: 1000px;
+  max-width: 1000px;
 }
-
+#username {
+  margin: 0;
+  text-shadow: var(--text-shadow);
+  font-size: 36px;
+  color: var(--default-username-color);
+}
 #title {
-  margin: 0 0 8px 0;
+  margin: 0;
   text-shadow: var(--text-shadow);
   font-size: 36px;
   color: var(--default-title-color);
 }
 #message {
   margin: 0;
+  margin-top: 1rem;
   font-size: 16px;
   text-shadow: var(--text-shadow);
+}
+
+#details {
+  display: flex;
+  justify-content: baseline;
+  flex-direction: column;
+  text-align: center;
 }
 
 .hidden {

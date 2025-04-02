@@ -19,363 +19,370 @@
 // dry out event handling start
 
 // NO TOUCHY BELOW
-const synth = window.speechSynthesis;
+const synth = window.speechSynthesis
 
-const eventQueue = [];
-let showingEvent = false;
-let isTalking = false;
-let intervalId = null;
-let voices = [];
-const giftSubIds = [];
+const eventQueue = []
+let showingEvent = false
+let isTalking = false
+let intervalId = null
+let voices = []
+const giftSubIds = []
 
 // replace {tokenName} with their value from the dataSet
 // unknown tokens are replaced with an empty string
-function replaceToken(targetString, dataSet) {
+function replaceToken (targetString, dataSet) {
   return targetString.replace(/{(\S*)}/g, function (m, key) {
     if (dataSet.hasOwnProperty(key)) {
-      return dataSet[key];
-    } else if (key.split(".").length > 1) {
-      const keyparts = key.split(".");
-      let objRef = dataSet;
+      return dataSet[key]
+    } else if (key.split('.').length > 1) {
+      const keyparts = key.split('.')
+      let objRef = dataSet
 
-      keyparts.forEach((part) => {
+      keyparts.forEach(part => {
         if (objRef.hasOwnProperty(part)) {
-          objRef = objRef[part];
+          objRef = objRef[part]
         } else {
-          objRef = null;
+          objRef = null
         }
-      });
-      return objRef ? objRef : "";
+      })
+      return objRef ? objRef : ''
     }
-  });
+  })
 }
 
 // given an array, returns a random item from it
-function selectRandomItemFromArray(items) {
+function selectRandomItemFromArray (items) {
   if (!items?.length) {
-    return null;
+    return null
   }
-  return items[Math.floor(Math.random() * items.length)];
+  return items[Math.floor(Math.random() * items.length)]
 }
 
 // Gets the key from the data event for accessing eventResponseStructure values
-function getEventStamp(eventInfo) {
+function getEventStamp (eventInfo) {
   if (!eventInfo) {
-    return null;
+    return null
   }
-  return `${eventInfo.source}.${eventInfo.type}`;
+  return `${eventInfo.source}.${eventInfo.type}`
 }
 
 // will run text to speech functionality with overrides if passed
 // falls back to defaultTTSSettings
-function textToSpeech(text, tts = {}) {
+function textToSpeech (text, tts = {}) {
   // if flag is off, no TTS regardless of settings on the event
   if (!enableTTS) {
-    return;
+    return
   }
 
   try {
     const voice =
       voices.find(
-        (v) => v.name.indexOf(tts.voice || defaultTTSSettings.voice) > -1
-      ) ?? undefined;
-    const utterThis = new SpeechSynthesisUtterance(text);
-    utterThis.pitch = tts.pitch || defaultTTSSettings.pitch;
-    utterThis.rate = tts.rate || defaultTTSSettings.rate;
-    utterThis.volume = tts.volume || defaultTTSSettings.volume;
+        v => v.name.indexOf(tts.voice || defaultTTSSettings.voice) > -1
+      ) ?? undefined
+    const utterThis = new SpeechSynthesisUtterance(text)
+    utterThis.pitch = tts.pitch || defaultTTSSettings.pitch
+    utterThis.rate = tts.rate || defaultTTSSettings.rate
+    utterThis.volume = tts.volume || defaultTTSSettings.volume
 
     if (voice) {
-      utterThis.voice = voice;
+      utterThis.voice = voice
     }
 
     setTimeout(() => {
-      synth.speak(utterThis);
-    }, (tts.delay || defaultTTSSettings.delay) ?? 1000);
+      synth.speak(utterThis)
+    }, (tts.delay || defaultTTSSettings.delay) ?? 1000)
   } catch (e) {
-    console.error(e);
+    console.error(e)
   }
 }
 
 // entry point for injecting data into the alert container
-function updateAlertContainer(data) {
+function updateAlertContainer (data) {
   // expand here for other platforms, if you want
-  let alert;
-  let structure;
-  const source = data?.event?.source;
+  let alert
+  let structure
+  const source = data?.event?.source
 
-  if (source === "Twitch") {
-    [alert, structure] = handleTwitchEvent(data);
-  } else if (source === "Kofi") {
-    [alert, structure] = handleKoFiEvent(data);
+  if (source === 'Twitch') {
+    ;[alert, structure] = handleTwitchEvent(data)
+  } else if (source === 'Kofi') {
+    ;[alert, structure] = handleKoFiEvent(data)
   }
 
   if (alert && structure) {
-    injectAlertMarkup(alert);
-    updateSoundEl(structure);
-    triggerAnimation(structure.duration);
+    debugger
+    injectAlertMarkup(alert)
+    updateSoundEl(structure)
+    triggerAnimation(structure.duration)
   }
 }
 
-function isNumberInRangeString(range, number) {
-  const rangeSplit = range.split("-");
+function isNumberInRangeString (range, number) {
+  const rangeSplit = range.split('-')
   if (rangeSplit.length !== 2) {
-    return;
+    return
   }
 
-  return number >= Number(rangeSplit[0]) && number <= Number(rangeSplit[1]);
+  return number >= Number(rangeSplit[0]) && number <= Number(rangeSplit[1])
 }
 
-function isMultipleOfNumber(multiple, number) {
-  return number % multiple === 0;
+function isMultipleOfNumber (multiple, number) {
+  return number % multiple === 0
 }
 
 // Based on the source and type of event, find the value of
 // specific prop from event to use as a value check for variants and exclusions
-function getValueToCheck(eventInfo, eventData) {
-  if (!eventInfo || !eventData) return;
+function getValueToCheck (eventInfo, eventData) {
+  if (!eventInfo || !eventData) return
 
-  if (eventInfo.source === "Twitch") {
+  if (eventInfo.source === 'Twitch') {
     switch (eventInfo.type) {
-      case "Cheer":
-        return eventData.bits;
-      case "Raid":
-        return eventData.viewerCount;
-      case "ReSub":
-        return eventData.cumulativeMonths;
-      case "GiftSub":
-        return eventData.totalSubsGifted;
-      case "GiftBomb":
-        return eventData.gifts;
+      case 'Cheer':
+        return eventData.bits
+      case 'Raid':
+        return eventData.viewerCount
+      case 'ReSub':
+        return eventData.cumulativeMonths
+      case 'GiftSub':
+        return eventData.totalSubsGifted
+      case 'GiftBomb':
+        return eventData.gifts
     }
-  } else if (eventInfo.source === "Kofi") {
-    return eventData.amount;
+  } else if (eventInfo.source === 'Kofi') {
+    return eventData.amount
   }
-  return;
+  return
 }
 
 // tries to find a match with more complex checks given an array of strings and the comparison
-function findMatch(keys, numberToCheck) {
+function findMatch (keys, numberToCheck) {
   // if it matches a range
-  let match;
+  let match
 
   // Check for range match
-  const matchedRanges = keys.filter((range) =>
+  const matchedRanges = keys.filter(range =>
     isNumberInRangeString(range, numberToCheck)
-  );
+  )
 
   if (matchedRanges.length) {
-    match = matchedRanges[0];
+    match = matchedRanges[0]
   }
 
   //
   if (!match) {
     match = keys
-      .filter((option) => option.startsWith("x"))
-      .find((option) => isMultipleOfNumber(option.slice(1), numberToCheck));
+      .filter(option => option.startsWith('x'))
+      .find(option => isMultipleOfNumber(option.slice(1), numberToCheck))
   }
 
   if (!match) {
     match = keys
-      .filter((option) => option.startsWith(">"))
-      .find((option) => Number(numberToCheck) > Number(option.slice(1)));
+      .filter(option => option.startsWith('>'))
+      .find(option => Number(numberToCheck) > Number(option.slice(1)))
   }
 
   if (!match) {
     match = keys
-      .filter((option) => option.startsWith("<"))
-      .find((option) => Number(numberToCheck) < Number(option.slice(1)));
+      .filter(option => option.startsWith('<'))
+      .find(option => Number(numberToCheck) < Number(option.slice(1)))
   }
-  return match;
+  return match
 }
 
 // based on the event source, get the correct template to render alert
-function fetchHtmlTemplate(eventInfo) {
-  let template;
+function fetchHtmlTemplate (eventInfo) {
+  let template
   switch (eventInfo?.source) {
-    case "Twitch":
-      template = document.querySelector("#twitchAlertTemplate");
-      break;
-    case "Kofi":
-      template = document.querySelector("#kofiAlertTemplate");
-      break;
+    case 'Twitch':
+      template = document.querySelector('#twitchAlertTemplate')
+      break
+    case 'Kofi':
+      template = document.querySelector('#kofiAlertTemplate')
+      break
   }
 
   if (template) {
-    return template.content.cloneNode(true);
+    return template.content.cloneNode(true)
   }
 
-  return undefined;
+  return undefined
 }
 
 // injects alert markup node into the correct spot
-function injectAlertMarkup(node) {
+function injectAlertMarkup (node) {
   if (node) {
-    document.querySelector("#alertContainer")?.appendChild(node);
+    document.querySelector('#alertContainer')?.appendChild(node)
   }
 }
 
 // updates the sound element on the page with a sound based on structure
-function updateSoundEl(structure) {
-  const soundEl = document.getElementById("sound");
-  const soundFile = selectRandomItemFromArray(structure.sounds);
+function updateSoundEl (structure) {
+  const soundEl = document.getElementById('sound')
+  const soundFile = selectRandomItemFromArray(structure.sounds)
   if (soundEl && soundFile) {
-    soundEl.src = soundFile;
+    soundEl.src = soundFile
   }
 }
 
 // returns true if should be excluded
-function checkForEventExclusions(eventInfo, eventData, structure) {
-  let numberToCheck;
+function checkForEventExclusions (eventInfo, eventData, structure) {
+  let numberToCheck
   if ((structure?.exclusions || []).length) {
-    numberToCheck = getValueToCheck(eventInfo, eventData);
+    numberToCheck = getValueToCheck(eventInfo, eventData)
     // check the numbers
     if (
       structure?.exclusions?.indexOf(Number(numberToCheck)) > -1 ||
       structure?.exclusions?.indexOf(numberToCheck) > -1
     ) {
-      return true;
+      return true
     }
 
     // check for other matches
-    const nonNumberVariants = structure?.exclusions?.filter((v) => isNaN(v));
+    const nonNumberVariants = structure?.exclusions?.filter(v => isNaN(v))
 
-    return !!findMatch(nonNumberVariants, numberToCheck);
+    return !!findMatch(nonNumberVariants, numberToCheck)
   }
-  return false;
+  return false
 }
 
 // checks if a gift sub is in the exclusion list
-function checkForGiftBombExclusions(eventInfo, eventData) {
-  if (!supressGiftBombSubEvents || eventInfo?.type !== "GiftSub") {
-    return false;
+function checkForGiftBombExclusions (eventInfo, eventData) {
+  if (!supressGiftBombSubEvents || eventInfo?.type !== 'GiftSub') {
+    return false
   }
-  return !!giftSubIds.find((id) => id === eventData.recipientUserId);
+  return !!giftSubIds.find(id => id === eventData.recipientUserId)
 }
 // merge variants into the base structure for specific
 // overrides of events
-function fetchEventVariant(eventInfo, eventData, structure) {
-  let numberToCheck;
-  let variantToMerge = {};
-  let returnVal = { ...structure };
+function fetchEventVariant (eventInfo, eventData, structure) {
+  let numberToCheck
+  let variantToMerge = {}
+  let returnVal = { ...structure }
 
   if (Object.keys(structure?.variants || [])?.length) {
-    numberToCheck = getValueToCheck(eventInfo, eventData);
+    numberToCheck = getValueToCheck(eventInfo, eventData)
 
     variantToMerge =
       structure?.variants[Number(numberToCheck)] ??
-      structure?.variants[numberToCheck];
+      structure?.variants[numberToCheck]
 
     // check for other matches
     if (!variantToMerge) {
-      const nonNumberVariants = Object.keys(structure?.variants)?.filter((v) =>
+      const nonNumberVariants = Object.keys(structure?.variants)?.filter(v =>
         isNaN(v)
-      );
+      )
 
       variantToMerge =
         structure?.variants[findMatch(nonNumberVariants, numberToCheck)] ||
-        undefined;
+        undefined
     }
   }
 
-  return { ...returnVal, ...(variantToMerge || {}) };
+  return { ...returnVal, ...(variantToMerge || {}) }
 }
 
 // show data into template
-function compileAlertMarkup(eventInfo, data) {
-  const { imgSrc, title, message } = data;
+function compileAlertMarkup (eventInfo, data) {
+  //debugger
+  const { imgSrc, title, message, username } = data
 
-  const contents = fetchHtmlTemplate(eventInfo);
+  const contents = fetchHtmlTemplate(eventInfo)
 
   if (contents) {
     contents
-      .querySelector(".alert")
-      ?.classList.add(getEventStamp(eventInfo).replace(".", "-").toLowerCase());
+      .querySelector('.alert')
+      ?.classList.add(getEventStamp(eventInfo).replace('.', '-').toLowerCase())
 
-    const alertImage = contents.getElementById("alertImage");
-    const titleEl = contents.getElementById("title");
-    const messageEl = contents.getElementById("message");
+    const alertImage = contents.getElementById('alertImage')
+    const usernameEl = contents.getElementById('username')
+    const titleEl = contents.getElementById('title')
+    const messageEl = contents.getElementById('message')
 
     if (imgSrc) {
-      alertImage.src = imgSrc;
-      alertImage.classList.remove("hidden");
+      alertImage.src = imgSrc
+      alertImage.classList.remove('hidden')
     }
 
-    titleEl.innerHTML = title;
-    messageEl.innerHTML = message;
+    titleEl.innerHTML = title
+    messageEl.innerHTML = message
+    usernameEl.innerHTML = username
   }
 
-  return contents;
+  return contents
 }
 
 // handles injecting info into the alert from a twitch event
 // NOTE most of this can probably be abstracted away? need to see
 // what other events might look like
-function handleTwitchEvent(data) {
-  const eventInfo = data?.event;
-  let eventData = data?.data;
-  let returnVal = [null, null];
+function handleTwitchEvent (data) {
+  const eventInfo = data?.event
+  let eventData = data?.data
+  let returnVal = [null, null]
   const templateData = {
     imgSrc: null,
     title: null,
     message: null,
-  };
+    username: null
+  }
 
   if (eventInfo && eventData) {
-    const eventStamp = getEventStamp(eventInfo);
+    const eventStamp = getEventStamp(eventInfo)
     const structure = fetchEventVariant(
       eventInfo,
       eventData,
       eventResponseStructure[eventStamp]
-    );
+    )
 
     if (structure) {
       // don't fire events when they are excluded
       if (checkForEventExclusions(eventInfo, eventData, structure)) {
-        return returnVal;
+        return returnVal
       }
 
       // if the giftsub was part of a giftbomb, and we're supressing them
       if (checkForGiftBombExclusions(eventInfo, eventData)) {
         // strip out id from list, exit early
-        giftSubIds = giftSubIds.filter((id) => id !== eventData.userId);
-        return returnVal;
+        giftSubIds = giftSubIds.filter(id => id !== eventData.userId)
+        return returnVal
       }
 
       if (eventData.isAnonymous) {
         templateData.title = replaceToken(
           selectRandomItemFromArray(structure.anonTitle),
           eventData
-        );
+        )
         templateData.message = replaceToken(
           selectRandomItemFromArray(structure.anonMessage),
           eventData
-        );
+        )
       } else {
+        templateData.username = replaceToken(
+          selectRandomItemFromArray(structure.username),
+          eventData
+        )
         templateData.title = replaceToken(
           selectRandomItemFromArray(structure.title),
           eventData
-        );
+        )
         templateData.message = replaceToken(
           selectRandomItemFromArray(structure.message),
           eventData
-        );
+        )
       }
 
       if (
-        ["Sub", "ReSub", "GiftSub", "GiftBomb"].indexOf(eventInfo?.type) > -1 &&
+        ['Sub', 'ReSub', 'GiftSub', 'GiftBomb'].indexOf(eventInfo?.type) > -1 &&
         structure.primeMessage.length &&
         eventData.is_prime
       ) {
         templateData.message = replaceToken(
           selectRandomItemFromArray(structure.primeMessage),
           eventData
-        );
+        )
       }
 
-      if (supressGiftBombSubEvents && eventInfo?.type === "GiftBomb") {
-        giftSubIds.push(
-          ...(eventData?.recipients?.map((sub) => sub?.id) || [])
-        );
+      if (supressGiftBombSubEvents && eventInfo?.type === 'GiftBomb') {
+        giftSubIds.push(...(eventData?.recipients?.map(sub => sub?.id) || []))
       }
 
       // override message if user has message and is supported and override is enabled
@@ -384,17 +391,17 @@ function handleTwitchEvent(data) {
         (eventData?.message || eventData?.text)
       ) {
         const msg =
-          typeof eventData?.message === "string"
+          typeof eventData?.message === 'string'
             ? eventData?.message
-            : eventData?.text;
-        templateData.message = msg ?? templateData.message;
+            : eventData?.text
+        templateData.message = msg ?? templateData.message
       }
 
       // override the image to the users profileImage if it exists and override is enabled
       if (structure.showProfileImage && eventData.profileImage) {
-        templateData.imgSrc = eventData.profileImage;
+        templateData.imgSrc = eventData.profileImage
       } else {
-        templateData.imgSrc = selectRandomItemFromArray(structure.images);
+        templateData.imgSrc = selectRandomItemFromArray(structure.images)
       }
 
       if (
@@ -403,40 +410,40 @@ function handleTwitchEvent(data) {
         templateData.message
       ) {
         if (
-          eventInfo?.type !== "Cheer" ||
+          eventInfo?.type !== 'Cheer' ||
           eventData?.bits >=
             (structure.tts?.cheerThreshold || defaultTTSSettings.cheerThreshold)
         ) {
-          textToSpeech(templateData.message, structure.tts);
+          textToSpeech(templateData.message, structure.tts)
         }
       }
-      returnVal = [compileAlertMarkup(eventInfo, templateData), structure];
+      returnVal = [compileAlertMarkup(eventInfo, templateData), structure]
     }
   }
-  return returnVal;
+  return returnVal
 }
 
-function handleKoFiEvent(data) {
-  const eventInfo = data?.event;
-  let eventData = data?.data;
-  let returnVal = [null, null];
+function handleKoFiEvent (data) {
+  const eventInfo = data?.event
+  let eventData = data?.data
+  let returnVal = [null, null]
   const templateData = {
     imgSrc: null,
     title: null,
-    message: null,
-  };
+    message: null
+  }
 
   if (eventInfo && eventData) {
-    const eventStamp = getEventStamp(eventInfo);
+    const eventStamp = getEventStamp(eventInfo)
     const structure = fetchEventVariant(
       eventInfo,
       eventData,
       eventResponseStructure[eventStamp]
-    );
+    )
     if (structure) {
       // don't fire events when they are excluded
       if (checkForEventExclusions(eventInfo, eventData, structure)) {
-        return returnVal;
+        return returnVal
       }
 
       templateData.title = replaceToken(
@@ -444,141 +451,141 @@ function handleKoFiEvent(data) {
           eventData.isPublic ? structure.title : structure.anonTitle
         ),
         eventData
-      );
+      )
 
       templateData.message = replaceToken(
         selectRandomItemFromArray(
           eventData.isPublic ? structure.message : structure.anonMessage
         ),
         eventData
-      );
+      )
 
       if (structure.showUserMessage && eventData.message) {
-        templateData.message = eventData.message;
+        templateData.message = eventData.message
       }
 
-      templateData.imgSrc = selectRandomItemFromArray(structure.images);
+      templateData.imgSrc = selectRandomItemFromArray(structure.images)
 
       if (
         structure.textToSpeech &&
         structure.showUserMessage &&
         templateData.message
       ) {
-        textToSpeech(templateData.message, structure.tts);
+        textToSpeech(templateData.message, structure.tts)
       }
 
-      returnVal = [compileAlertMarkup(eventInfo, templateData), structure];
+      returnVal = [compileAlertMarkup(eventInfo, templateData), structure]
     }
   }
-  return returnVal;
+  return returnVal
 }
 // Queue-related stuff
 //////////////////////
 
 // polling interval that will look for new alerts every half-second
-function startQueueProcessing() {
+function startQueueProcessing () {
   if (!intervalId) {
-    intervalId = setInterval(handleQueueItem, 500);
+    intervalId = setInterval(handleQueueItem, 500)
   }
 }
 
 // workhourse function that will show the next alert as long as
 // another alert is not currently being rendered
-function handleQueueItem() {
+function handleQueueItem () {
   if (!showingEvent && eventQueue.length) {
-    const newEvent = eventQueue.shift();
+    const newEvent = eventQueue.shift()
 
-    updateAlertContainer(newEvent);
+    updateAlertContainer(newEvent)
   }
 }
 
-function triggerAnimation(duration) {
+function triggerAnimation (duration) {
   setTimeout(function () {
-    startEndAnimation();
-  }, duration ?? defaultEventDisplayTime);
+    startEndAnimation()
+  }, duration ?? defaultEventDisplayTime)
 }
 
 // event to push listener data to the queue and starts the polling
-function addEventToQueue(data) {
+function addEventToQueue (data) {
   if (DEBUG_MODE) {
-    console.log("event added to queue:", data);
+    console.log('event added to queue:', data)
   }
 
-  eventQueue.push(data);
-  startQueueProcessing();
+  eventQueue.push(data)
+  startQueueProcessing()
 }
 
 // animation stuff
 //////////////////////
 
 // clears out the alert info
-function clearAlert() {
-  const alertContainer = document.getElementById("alertContainer");
-  alertContainer.classList.remove(...alertContainer.classList);
-  alertContainer.innerHTML = "";
+function clearAlert () {
+  const alertContainer = document.getElementById('alertContainer')
+  alertContainer.classList.remove(...alertContainer.classList)
+  alertContainer.innerHTML = ''
 }
 
-function startEndAnimation() {
-  document.querySelector(".alert").classList.add("bounce-out");
+function startEndAnimation () {
+  document.querySelector('.alert').classList.add('bounce-out')
 }
 
 // event listener to do some shenanigans when the animate-in animation starts
-function onAnimationStart(event) {
-  if (event.animationName === "bounce-in") {
-    showingEvent = true;
-    const soundEl = document.getElementById("sound");
+function onAnimationStart (event) {
+  if (event.animationName === 'bounce-in') {
+    showingEvent = true
+    const soundEl = document.getElementById('sound')
 
     if (soundEl?.src) {
       try {
-        soundEl.play();
+        soundEl.play()
       } catch (e) {
-        console.error("music error", e);
+        console.error('music error', e)
       }
     }
   }
 }
 
 // event listener to do some shenanigans when the animate-out animation ends
-function hideOnAnimationEnd(event) {
-  if (event.animationName === "bounce-out") {
-    clearAlert();
-    showingEvent = false;
+function hideOnAnimationEnd (event) {
+  if (event.animationName === 'bounce-out') {
+    clearAlert()
+    showingEvent = false
   }
-  if (event.animationName === "bounce-in") {
-    document.querySelector(".alert").classList.remove("bounce-in");
+  if (event.animationName === 'bounce-in') {
+    document.querySelector('.alert').classList.remove('bounce-in')
   }
 }
 
-function attachListeners() {
+function attachListeners () {
   // animation listeners
-  document.addEventListener("animationstart", onAnimationStart);
-  document.addEventListener("animationend", hideOnAnimationEnd);
+  document.addEventListener('animationstart', onAnimationStart)
+  document.addEventListener('animationend', hideOnAnimationEnd)
 
   if (synth) {
-    voices = synth.getVoices();
+    voices = synth.getVoices()
   }
   if (synth.onvoiceschanged !== undefined) {
     synth.onvoiceschanged = () => {
-      voices = synth.getVoices();
-    };
+      voices = synth.getVoices()
+    }
 
-    voices = synth.getVoices();
+    voices = synth.getVoices()
   }
 }
 
-function setCSSVars() {
-  let root = document.documentElement;
+function setCSSVars () {
+  let root = document.documentElement
 
-  root.addEventListener("mousemove", (e) => {
-    root.style.setProperty("--primary-text-color", primaryTextColor);
-    root.style.setProperty("--default-title-color", titleColor);
-    root.style.setProperty("--text-shadow", textShadow);
-    root.style.setProperty("--font-stack", fontStack);
-    root.style.setProperty("--animate-in-speed", animateInSpeed);
-    root.style.setProperty("--animate-out-speed", animateOutSpeed);
-    root.style.setProperty("--img-animate-in-speed", imgAnimateInSpeed);
-    root.style.setProperty("--img-animate-out-speed", imgAnimateOutSpeed);
-  });
+  root.addEventListener('mousemove', e => {
+    root.style.setProperty('--primary-text-color', primaryTextColor)
+    root.style.setProperty('--default-title-color', titleColor)
+    root.style.setProperty('--text-shadow', textShadow)
+    root.style.setProperty('--font-stack', fontStack)
+    root.style.setProperty('--animate-in-speed', animateInSpeed)
+    root.style.setProperty('--animate-out-speed', animateOutSpeed)
+    root.style.setProperty('--img-animate-in-speed', imgAnimateInSpeed)
+    root.style.setProperty('--img-animate-out-speed', imgAnimateOutSpeed)
+  })
 }
 
 // Entry point for whole application. attaches the websocket listeners as
@@ -587,15 +594,15 @@ function setCSSVars() {
 //https://streamerbot.github.io/client/get-started/setup << if you want custom options
 
 const client = new StreamerbotClient({
-  subscribe: "*",
-  onData: (data) => {
+  subscribe: '*',
+  onData: data => {
     if (DEBUG_MODE) {
-      console.log("streamerbot event:", data);
+      console.log('streamerbot event:', data)
     }
 
-    const eventName = getEventStamp(data?.event);
+    const eventName = getEventStamp(data?.event)
     if (Object.keys(eventResponseStructure).indexOf(eventName) > -1) {
-      addEventToQueue(data);
+      addEventToQueue(data)
     }
-  },
-});
+  }
+})
