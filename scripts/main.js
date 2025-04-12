@@ -110,7 +110,7 @@ function updateAlertContainer (data) {
   }
 
   if (alert && structure) {
-    debugger
+    //debugger
     injectAlertMarkup(alert)
     updateSoundEl(structure)
     triggerAnimation(structure.duration)
@@ -356,6 +356,7 @@ function handleTwitchEvent (data) {
           eventData
         )
       } else {
+        debugger
         templateData.username = replaceToken(
           selectRandomItemFromArray(structure.username),
           eventData
@@ -594,6 +595,8 @@ function setCSSVars () {
 //https://streamerbot.github.io/client/get-started/setup << if you want custom options
 
 const client = new StreamerbotClient({
+  host: '127.0.0.1',
+  port: '8080',
   subscribe: '*',
   onData: data => {
     if (DEBUG_MODE) {

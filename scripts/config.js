@@ -66,10 +66,10 @@ const imgAnimateOutSpeed = '2.5s'
 const eventResponseStructure = {
   // https://docs.streamer.bot/api/servers/websocket/events/twitch#follow
   'Twitch.Follow': {
-    username: ['{user.name}!'],
+    username: ['{user_name}'],
     title: ['New Follower'],
-    message: ['Welcome ', 'Howdy '],
-    images: ['images/welcome-1.webp'],
+    message: ['Welcome '],
+    images: ['videos/cheer-1.webm'],
     sounds: ['sounds/alert-follow.mp3'],
     duration: 8000
   },
